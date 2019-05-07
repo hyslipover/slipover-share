@@ -5,7 +5,11 @@ package org.slipover.frame.share.code;
  */
 public enum CommonCode implements ServerCode {
 
-    SUCCESS("C_200", "成功"),ERROR("C_500", "错误"),EXCEPTION("C_502", "异常"),VERIFY_ERROR("C_400", "验证错误");
+    SUCCESS("C_200", "成功"),
+    VERIFY_ERROR("C_400", "验证错误"),
+    NO_ACCESS("C_403", "无权限"),
+    ERROR("C_500", "错误"),
+    EXCEPTION("C_502", "异常");
 
     private String code;
 

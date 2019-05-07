@@ -74,11 +74,8 @@ public class PageData<T> extends Pageable {
         this.startParallelStream = Math.abs(startParallelStream);
     }
 
-    protected Stream<T> stream(){
-        if (data.size() >= startParallelStream) {
-            return data.parallelStream();
-        }
-        return data.stream();
+    public Stream<T> stream(){
+        return data.size() >= startParallelStream ? data.parallelStream() : data.stream();
     }
 
 }
