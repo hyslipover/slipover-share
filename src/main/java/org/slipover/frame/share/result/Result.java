@@ -18,6 +18,8 @@ public class Result<T> implements Serializable {
 
     private String message;
 
+    private String normMessage;
+
     public Result(T data) {
         this.data = data;
         setCode(CommonCode.SUCCESS);
@@ -27,9 +29,15 @@ public class Result<T> implements Serializable {
         setCode(serverCode);
     }
 
+    public Result(ServerCode serverCode, String message) {
+        setCode(serverCode);
+        this.message = message;
+    }
+
     public Result(String code, String message) {
         this.code = code;
         this.message = message;
+        this.normMessage = message;
     }
 
     public Result(T data, ServerCode serverCode) {
@@ -37,10 +45,17 @@ public class Result<T> implements Serializable {
         setCode(serverCode);
     }
 
+    public Result(T data, ServerCode serverCode, String message) {
+        this.data = data;
+        setCode(serverCode);
+        this.message = message;
+    }
+
     public Result(T data, String code, String message) {
         this.data = data;
         this.code = code;
         this.message = message;
+        this.normMessage = message;
     }
 
     public T getData() {
@@ -61,7 +76,10 @@ public class Result<T> implements Serializable {
 
     public void setCode(ServerCode serverCode) {
         this.code = serverCode.code();
-        this.message = serverCode.message();
+        this.normMessage = serverCode.message();
+        if (message == null) {
+            this.message = serverCode.message();
+        }
     }
 
     public String getMessage() {
@@ -72,8 +90,20 @@ public class Result<T> implements Serializable {
         this.message = message;
     }
 
+    public String getNormMessage() {
+        return normMessage;
+    }
+
+    public void setNormMessage(String normMessage) {
+        this.normMessage = normMessage;
+    }
+
     public boolean isCode(String code) {
         return code.equals(this.code);
+    }
+
+    public boolean isCode(ServerCode serverCode) {
+        return Objects.nonNull(serverCode) && serverCode.code().equals(this.code);
     }
 
     public boolean isSuccess() {
@@ -106,8 +136,21 @@ public class Result<T> implements Serializable {
         }
     }
 
+    public void ifEqualsCode(ServerCode serverCode, Consumer<T> consumer) {
+        if (isCode(serverCode)) {
+            consumer.accept(data);
+        }
+    }
+
     public <R> Optional<R> ifEqualsCode(String code, Function<T,R> function) {
         if (isCode(code)) {
+            return Optional.ofNullable(function.apply(data));
+        }
+        return Optional.empty();
+    }
+
+    public <R> Optional<R> ifEqualsCode(ServerCode serverCode, Function<T,R> function) {
+        if (isCode(serverCode)) {
             return Optional.ofNullable(function.apply(data));
         }
         return Optional.empty();
